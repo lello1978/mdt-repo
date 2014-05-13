@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model name="mdt:model" xmlns="http://www.alfresco.org/model/dictionary/1.0">
+<!-- 21/01/2014 mdt-repo-4  GD Aggiunto aspetto QRInfoAspect -->
+<!-- 14/02/2014 mdt-repo-5  GD Ristrutturato per release iniziale Pocaterra. Modificata struttura aspects, eliminato mdtContent e mdtDoc, ristrutturati folerLotto e folderMatricola -->
+<!-- 18/02/2014 mdt-repo-5.1  GD Corrette label elementi -->
+
+	<!-- Metadata about the model -->
+	<description>MecaDocTrack Content Model</description>
+	<author>lc</author>
+	<version>1.0</version>
+
+	<!-- Imports are required to allow references to definitions in other models -->
+	<imports>
+		<!-- Import Alfresco Dictionary Definitions -->
+		<import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d"/>
+		<!-- Import Alfresco Content Domain Model Definitions -->
+		<import uri="http://www.alfresco.org/model/content/1.0" prefix="cm"/>
+		<!-- Import Alfresco Datalist Content Model -->
+		<import uri="http://www.alfresco.org/model/datalist/1.0" prefix="dl"/>
+	</imports>
+
+	<!-- Define the URI and Prefix for this content model -->
+	<namespaces>
+		<namespace uri="http://www.lc.com/model/mdt/1.0" prefix="mdt"/>
+	</namespaces>
+
+
+	<!-- Define constraints -->
+	<constraints>
+	</constraints>
+
+
+	<!-- Types -->
+	<types>
+		<type name="mdt:folder"> <!-- pater familias dei folder MDT. NON ASSEGNARE aspects a meno che non si sia CERTI che servono in TUTTI i folder figlio -->
+			<title>MecaDocTrack folder</title>
+			<parent>cm:folder</parent>
+		</type>
+		<type name="mdt:folderLotto">
+			<title>MecaDocTrack folder Lotto</title>
+			<parent>mdt:folder</parent>
+			<mandatory-aspects>
+				<aspect>mdt:MecaDocTrackElementIDAspect</aspect>
+				<aspect>mdt:MecaDocTrackArticleIDAspect</aspect>
+				<aspect>mdt:MecaDocTrackJobIDAspect</aspect>
+			</mandatory-aspects>
+		</type>
+		<type name="mdt:folderMatricola">
+			<title>MecaDocTrack folder Matricola</title>
+			<parent>mdt:folder</parent>
+			<mandatory-aspects>
+				<aspect>mdt:MecaDocTrackElementIDAspect</aspect>
+				<aspect>mdt:MecaDocTrackArticleIDAspect</aspect>
+				<aspect>mdt:MecaDocTrackJobIDAspect</aspect>
+				<aspect>mdt:MecaDocTrackElementGroupAspect</aspect>
+			</mandatory-aspects>
+		</type>
+
+	</types>
+
+
+	<!-- Aspects -->
+	<aspects>
+	
+		<!-- MecaDocTrackElement Aspect -->
+		<aspect name="mdt:MecaDocTrackElementIDAspect">
+			<title>MecaDocTrack elemento</title>
+			<properties>
+				<property name="mdt:idElemento">
+						<title>ID Lotto/Matricola</title>
+						<type>d:text</type>
+					<mandatory>false</mandatory> <!-- andrebbe settato a true ma in fase di implementazione è più comodo a false -->
+					<multiple>false</multiple>
+				</property>
+			</properties>
+		</aspect>
+				
+				
+		<!-- MecaDocTrackArticle Aspect -->
+		<aspect name="mdt:MecaDocTrackArticleIDAspect">
+			<title>MecaDocTrack Info Articolo</title>
+			<properties>
+				<property name="mdt:articolo">
+					<title>Articolo</title>
+					<type>d:text</type>
+				</property>
+			</properties>
+		</aspect>
+
+		<!-- MecaDocTrackJob Aspect-->
+		<aspect name="mdt:MecaDocTrackJobIDAspect">
+			<title>MecaDocTrack Info Job</title>
+			<properties>
+				<property name="mdt:job">
+					<title>Job</title>
+					<type>d:text</type>
+				</property>
+				<property name="mdt:riferimento">
+					<title>Riferimento</title>
+					<type>d:text</type>
+				</property>
+			</properties>
+		</aspect>
+
+		<!-- MecaDocTrackGroup Aspect-->
+		<aspect name="mdt:MecaDocTrackElementGroupAspect">
+			<title>MecaDocTrack Info elementi</title>
+			<properties>
+				<property name="mdt:listaElementi">
+					<title>ID elementi inclusi</title>
+					<type>d:text</type>
+					<multiple>false</multiple> <!-- volutamente 'false', usare liste separate da ',' o ', ' -->
+				</property>
+			</properties>
+		</aspect>
+
+		<!-- QRInfo Aspect-->
+		<aspect name="mdt:QRInfoAspect">
+			<title>MecaDocTrack QR</title>
+			<properties>
+				<property name="mdt:QRInfoString">
+					<title>Dato rilevato dal QR</title>
+					<type>d:text</type>
+					<multiple>false</multiple>
+				</property>
+			</properties>
+		</aspect>
+
+
+
+
+	</aspects>
+
+</model>
