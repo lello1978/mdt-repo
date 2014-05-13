@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import mdtQR.QRCode;
+import mdtFOP.fopMDT;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.ContentServicePolicies;
@@ -242,11 +243,11 @@ NodeServicePolicies.OnDeleteNodePolicy {
     		
     		
     		try{
+    			mdtFOP.fopMDT.GenerateLabelPaper(nodeRef);
     			
     			
+    			/*
     			String tempFileName = String.valueOf(UUID.randomUUID())+".fo";
-    			
-    			try {
     				System.out.println("MDT - Reading content of fo file");
     				//TODO: VErificare che il file esista nel sito mdtAdmin
     			    ResultSet foFile= searchService.query(storeRef, SearchService.LANGUAGE_XPATH, "/app:company_home/st:sites/cm:mdtadmin/cm:documentLibrary/cm:xmlTemplate/cm:FOP/cm:mdtFo.fo");
@@ -298,7 +299,7 @@ NodeServicePolicies.OnDeleteNodePolicy {
     				 System.out.println("MDT - Temporary file deleted");
     			}
     		
-    			
+    			*/
     	} catch (Exception e){
     		System.out.println("MDT - Something went wrong in FOP conversion: error Stack: "+ e.getMessage());
     		e.printStackTrace();
