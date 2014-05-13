@@ -118,7 +118,7 @@ public static String readBarcodeXML(){
 	ResultSet barcodeConfigFile= mdt.mdtBehaviours.searchService.query(mdt.mdtBehaviours.storeRef, SearchService.LANGUAGE_XPATH, "/app:company_home/st:sites/cm:mdtadmin/cm:documentLibrary/cm:xmlTemplate/cm:FOP/cm:barcodeConfig.properties");
 	reader = mdt.mdtBehaviours.contentService.getReader(barcodeConfigFile.getNodeRefs().get(0), ContentModel.PROP_CONTENT);
     String barcodeXMLFileName = reader.getContentString();
-	System.out.println("MDT - Barcode file name from : "+ mdt.mdtBehaviours.fileFolderService.getFileInfo(barcodeConfigFile.getNodeRef(9)).getName());
+	System.out.println("MDT - Barcode file name from : "+ mdt.mdtBehaviours.fileFolderService.getFileInfo(barcodeConfigFile.getNodeRef(0)).getName());
 	
     ResultSet barcodeFile= mdt.mdtBehaviours.searchService.query(mdt.mdtBehaviours.storeRef, SearchService.LANGUAGE_XPATH, "/app:company_home/st:sites/cm:mdtadmin/cm:documentLibrary/cm:xmlTemplate/cm:FOP/cm:"+barcodeXMLFileName);
     System.out.println("MDT - Using Barcode file name : "+ mdt.mdtBehaviours.fileFolderService.getFileInfo(barcodeFile.getNodeRef(0)).getName());
