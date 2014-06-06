@@ -27,6 +27,8 @@ import ucar.unidata.util.StringUtil;
  */
 public class fopMDT {
 	private static String fo="";
+	private static String labelTitle="";
+	private static String labelDesc="";
 
 	/** 
 	 * 
@@ -54,22 +56,20 @@ public class fopMDT {
 				for (FileInfo foFile:foFiles){
 					System.out.println("MDT - Begin label creation for file "+ foFile.getName()+". Read content...");
 					reader = mdt.mdtBehaviours.contentService.getReader(foFile.getNodeRef(), ContentModel.PROP_CONTENT);
+					labelTitle=((mdt.mdtBehaviours.nodeService.getProperty(foFile.getNodeRef(), ContentModel.PROP_TITLE)==null)?"N/D":mdt.mdtBehaviours.nodeService.getProperty(foFile.getNodeRef(), ContentModel.PROP_TITLE).toString());
+					labelDesc=((mdt.mdtBehaviours.nodeService.getProperty(foFile.getNodeRef(), ContentModel.PROP_DESCRIPTION)==null)?"N/D":mdt.mdtBehaviours.nodeService.getProperty(foFile.getNodeRef(), ContentModel.PROP_DESCRIPTION).toString());
 					fo = reader.getContentString();
 					System.out.println("MDT - DEBUG - fo content: " + "\r" + fo);
 					System.out.println("MDT - Inject folder data before PDF creation from folder: " + mdt.mdtBehaviours.fileFolderService.getFileInfo(nodeRef).getName());
 					System.out.println("MDT - Inject idElemento: " + mdt.mdtBehaviours.nodeService.getProperty(nodeRef, ContentModel.PROP_NAME).toString());
 					fo=StringUtils.replace(fo, "##idEelemento##", mdt.mdtBehaviours.nodeService.getProperty(nodeRef, ContentModel.PROP_NAME).toString());
-					//fo=fo.replaceAll("##idEelemento##", mdt.mdtBehaviours.nodeService.getProperty(nodeRef, ContentModel.PROP_NAME).toString());
 					System.out.println("MDT - Inject descrizione: " + ((mdt.mdtBehaviours.nodeService.getProperty(nodeRef, ContentModel.PROP_DESCRIPTION) == null) ? "N/D" : mdt.mdtBehaviours.nodeService.getProperty(nodeRef, ContentModel.PROP_DESCRIPTION).toString()));
 					fo=StringUtils.replace(fo, "##descrizione##", ((mdt.mdtBehaviours.nodeService.getProperty(nodeRef, ContentModel.PROP_DESCRIPTION) == null) ? "N/D" : mdt.mdtBehaviours.nodeService.getProperty(nodeRef, ContentModel.PROP_DESCRIPTION).toString()));
-					//fo=fo.replaceAll("##descrizione##", mdt.mdtBehaviours.nodeService.getProperty(nodeRef, ContentModel.PROP_DESCRIPTION).toString());
 					System.out.println("MDT - Inject articolo: "+ ((mdt.mdtBehaviours.nodeService.getProperty(nodeRef, ContentModel.PROP_DESCRIPTION) == null) ? "N/D" : mdt.mdtBehaviours.nodeService.getProperty(nodeRef, ContentModel.PROP_DESCRIPTION).toString()));
 					fo=StringUtils.replace(fo, "##articolo##",  ((mdt.mdtBehaviours.nodeService.getProperty(nodeRef, ContentModel.PROP_DESCRIPTION) == null) ? "N/D" : mdt.mdtBehaviours.nodeService.getProperty(nodeRef, ContentModel.PROP_DESCRIPTION).toString()));
-					//fo=fo.replaceAll("##articolo##", mdt.mdtBehaviours.nodeService.getProperty(nodeRef, ContentModel.PROP_DESCRIPTION).toString());
 					System.out.println("MDT - Inject barcode data before PDF creation...");
 					barcode=StringUtils.replace(barcode, "MDTQRMDTQR", mdt.mdtBehaviours.nodeService.getProperty(nodeRef, ContentModel.PROP_NAME).toString());
 					fo=StringUtils.replace(fo,"<fo:inline>mdtQRCODE</fo:inline>",barcode);
-					//fo=fo.replaceAll("<fo:inline>mdtQRCODE</fo:inline>", barcode.replaceAll("MDTQRMDTQR", mdt.mdtBehaviours.nodeService.getProperty(nodeRef, ContentModel.PROP_NAME).toString()));
 					String tempFileName = String.valueOf(UUID.randomUUID())+".fo";
 					System.out.println("MDT - Begin fo transfomation on disk for file: " + foFile.getName());
 					try{
@@ -90,6 +90,8 @@ public class fopMDT {
 							QName contentQName = QName.createQName("{http://www.alfresco.org/model/content/1.0}content");
 							FileInfo pdfFile = mdt.mdtBehaviours.fileFolderService.create(nodeRef,"QR-"+tempFileName+"-"+mdt.mdtBehaviours.nodeService.getProperty(nodeRef, ContentModel.PROP_NAME).toString()+".pdf", contentQName);
 							NodeRef pdf = pdfFile.getNodeRef();
+							mdt.mdtBehaviours.nodeService.setProperty(pdf, ContentModel.PROP_DESCRIPTION,labelDesc);
+							mdt.mdtBehaviours.nodeService.setProperty(pdf, ContentModel.PROP_TITLE,labelTitle);
 							ContentWriter writer = mdt.mdtBehaviours.contentService.getWriter(pdf, ContentModel.PROP_CONTENT, true);
 							System.out.println("MDT - Put PDF label file, " +pdfFile.getName()+" in MDT folder: " + mdt.mdtBehaviours.fileFolderService.getFileInfo(nodeRef).getName() );
 							writer.setMimetype("application/pdf");
