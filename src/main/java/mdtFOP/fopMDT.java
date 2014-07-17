@@ -11,6 +11,7 @@ import java.util.UUID;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.model.FileInfo;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -68,9 +69,12 @@ public class fopMDT {
 					System.out.println("MDT - Inject articolo: "+ ((mdt.mdtBehaviours.nodeService.getProperty(nodeRef, ContentModel.PROP_DESCRIPTION) == null) ? "N/D" : mdt.mdtBehaviours.nodeService.getProperty(nodeRef, ContentModel.PROP_DESCRIPTION).toString()));
 					fo=StringUtils.replace(fo, "##articolo##",  ((mdt.mdtBehaviours.nodeService.getProperty(nodeRef, ContentModel.PROP_DESCRIPTION) == null) ? "N/D" : mdt.mdtBehaviours.nodeService.getProperty(nodeRef, ContentModel.PROP_DESCRIPTION).toString()));
 					System.out.println("MDT - Inject barcode data before PDF creation...");
-					if (!mdt.mdtBehaviours.nodeService.hasAspect(nodeRef, mdt.mdtBehaviours.ASPECT_MecaDocTrackMateriaGroupAspect)){
+					ChildAssociationRef childAssociationRef = mdt.mdtBehaviours.nodeService.getPrimaryParent(nodeRef);
+					NodeRef parent = childAssociationRef.getParentRef();
+					String parentName= mdt.mdtBehaviours.nodeService.getProperty(parent,ContentModel.PROP_NAME).toString();
+					if (parentName=="PRODUZIONE"){
 						barcode=StringUtils.replace(barcode, "MDTQRMDTQR", mdt.mdtBehaviours.nodeService.getProperty(nodeRef, ContentModel.PROP_NAME).toString()+":p");
-					}else{
+					}else if (parentName=="MATERIA"){
 						barcode=StringUtils.replace(barcode, "MDTQRMDTQR", mdt.mdtBehaviours.nodeService.getProperty(nodeRef, ContentModel.PROP_NAME).toString()+":m");
 					}
 					fo=StringUtils.replace(fo,"<fo:inline>mdtQRCODE</fo:inline>",barcode);
