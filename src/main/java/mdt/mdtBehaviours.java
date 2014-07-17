@@ -88,11 +88,11 @@ NodeServicePolicies.OnDeleteNodePolicy {
     /* Aspect names */
     public static final QName ASPECT_QRInfoAspect = QName.createQName("http://www.lc.com/model/mdt/1.0", "QRInfoAspect");
     public static final QName ASPECT_MecaDocTrackElementIDAspect = QName.createQName("http://www.lc.com/model/mdt/1.0", "MecaDocTrackElementIDAspect");
+    public static final QName ASPECT_MecaDocTrackMateriaGroupAspect = QName.createQName("http://www.lc.com/model/mdt/1.0", "MecaDocTrackMateriaGroupAspect");
     
     /* Property names */
     public static final QName PROP_QRInfoString = QName.createQName("http://www.lc.com/model/mdt/1.0", "QRInfoString");
     public static final QName PROP_idElemento = QName.createQName("http://www.lc.com/model/mdt/1.0", "idElemento");
-  
     /**
      * Spring initilaise method used to register the policy behaviours
      */
@@ -163,10 +163,11 @@ NodeServicePolicies.OnDeleteNodePolicy {
 			siteID=this.fileFolderService.getFileInfo(parent).getName();
 			System.out.println("MDT - SiteID where to put content is: " + siteID);
 			rs = searchService.query(storeRef, SearchService.LANGUAGE_XPATH, "/app:company_home/st:sites/cm:" + siteID + "/cm:documentLibrary/cm:PRODUZIONE");
+ 			
 			//if QR is found....
 			System.out.println("MDT - Extract image from file content for QR searching");
 			qr = extractQRfromPDF(is);
- 			if (qr != null) {
+			if (qr != null) {
  				System.out.println("MDT - QR code find. Code: '"+qr+"' Try to put content in referred MDT folder.");
  				//Set QRInfoString to QR code value.	
  				this.nodeService.setProperty(nodeRef, PROP_QRInfoString,qr);
@@ -174,8 +175,15 @@ NodeServicePolicies.OnDeleteNodePolicy {
  				System.out.println("MDT - Search for match between QR and MDT destination folder name.");
  				System.out.println("MDT - Search for matching under path: " + "/app:company_home/st:sites/cm:" + siteID + "/cm:documentLibrary/cm:PRODUZIONE");
  				if (rs.length()>=1){
- 					System.out.println("MDT - Search for matching with folders."); //+this.fileFolderService.getFileInfo(rs.getNodeRef(0)).getName());
- 					destFolderRef = this.fileFolderService.searchSimple(rs.getNodeRef(0), qr);
+ 					if(qr.split(":")[1]=="p"){
+ 					System.out.println("MDT - Search for matching with folders productions."); 
+ 					destFolderRef = this.fileFolderService.searchSimple(rs.getNodeRef(0), qr.split(":")[0]);
+ 					}else if (qr.split(":")[1]=="m"){
+ 						System.out.println("MDT - Search for matching with folders materials."); 
+ 						rs = searchService.query(storeRef, SearchService.LANGUAGE_XPATH, "/app:company_home/st:sites/cm:" + siteID + "/cm:documentLibrary/cm:MATERIA");
+ 						destFolderRef = this.fileFolderService.searchSimple(rs.getNodeRef(0), qr.split(":")[0]);
+ 						
+ 					}
  					
  				}
  				if (destFolderRef!=null){
@@ -245,61 +253,6 @@ NodeServicePolicies.OnDeleteNodePolicy {
     		try{
     			mdtFOP.fopMDT.GenerateLabelPaper(nodeRef);
     			
-    			
-    			/*
-    			String tempFileName = String.valueOf(UUID.randomUUID())+".fo";
-    				System.out.println("MDT - Reading content of fo file");
-    				//TODO: VErificare che il file esista nel sito mdtAdmin
-    			    ResultSet foFile= searchService.query(storeRef, SearchService.LANGUAGE_XPATH, "/app:company_home/st:sites/cm:mdtadmin/cm:documentLibrary/cm:xmlTemplate/cm:FOP/cm:mdtFo.fo");
-    			    reader = contentService.getReader(foFile.getNodeRef(0), ContentModel.PROP_CONTENT);
-    			    String fo = reader.getContentString();
-    			    System.out.println("MDT - Reading content of barcodeFile XML file");
-    			    //TODO: Verificare che il file esista nel sito mdtAdmin
-    			    ResultSet barcodeFile= searchService.query(storeRef, SearchService.LANGUAGE_XPATH, "/app:company_home/st:sites/cm:mdtadmin/cm:documentLibrary/cm:xmlTemplate/cm:FOP/cm:mdtXmlQr.xml");
-    			    reader = contentService.getReader(barcodeFile.getNodeRef(0), ContentModel.PROP_CONTENT);
-    			    String barcode = reader.getContentString();
-    			    System.out.println("MDT - Inject folder data before PDF creation.");
-    			    //Sostituzione caratteri e stringhe MDT
-    			    fo=fo.replaceAll("##idEelemento##", nodeService.getProperty(nodeRef, ContentModel.PROP_NAME).toString());
-    			    fo=fo.replaceAll("##descrizione##", nodeService.getProperty(nodeRef, ContentModel.PROP_DESCRIPTION).toString());
-    			    //fo=fo.replaceAll("##articolo##", nodeService.getProperty(nodeRef, ContentModel.PROP_NAME).toString());
-    			    //fo=fo.replaceAll("##riferimento##", nodeService.getProperty(nodeRef, ContentModel.PROP_NAME).toString());
-    			    //Sostituzione Barcode
-    			    fo=fo.replaceAll("<fo:inline>mdtQRCODE</fo:inline>", barcode.replaceAll("MDTQRMDTQR", nodeService.getProperty(nodeRef, ContentModel.PROP_NAME).toString()));
-    			    //fo=fo.replaceAll("\\\\{mdtFolder\\\\}", nodeService.getProperty(nodeRef, ContentModel.PROP_NAME).toString());
-    			    System.out.println("MDT - Begin fo transfomation on disk.");
-    			    File tempFile = new File(tempFileName);
-                    FileWriter file = new FileWriter(tempFile);
-                    BufferedWriter out = new BufferedWriter (file);
-                    out.write(fo);
-                    out.close();
-                    System.out.println("MDT - Starting FOP from command line command.");
-                    Process fop;
-    			    String fopCommand = "/opt/fop-1.1/fop -fo "+tempFileName+" -pdf "+tempFileName+".pdf";
-    			    fop= Runtime.getRuntime().exec(fopCommand);
-    			    int fopExit =fop.waitFor();
-    			    if (fopExit==0){
-    			    	System.out.println("MDT - Conversion with FOP terminate WITHOUT error.");
-    			    	QName contentQName = QName.createQName("{http://www.alfresco.org/model/content/1.0}content");
-    			    	FileInfo pdfFile = fileFolderService.create(nodeRef,"QR"+nodeService.getProperty(nodeRef, ContentModel.PROP_NAME).toString()+".pdf", contentQName);
-    			    	NodeRef pdf = pdfFile.getNodeRef();
-    			    	ContentWriter writer = contentService.getWriter(pdf, ContentModel.PROP_CONTENT, true);
-    			    	System.out.println("MDT - Put PDF label file in MDT folder.");
-    			    	writer.setMimetype("application/pdf");
-    			    	writer.guessEncoding();
-    			    	tempFile= new File(tempFileName+".pdf");
-    			    	writer.putContent(tempFile);
-    			    }
-    			} finally {
-    				System.out.println("MDT - Delete .fo and .pdf temporary files from disk.");
-    				 File f = new File(tempFileName);
-    				 if (f.exists()){f.delete();};
-    				 f=  new File(tempFileName+".pdf");
-    				 if (f.exists()){f.delete();};   
-    				 System.out.println("MDT - Temporary file deleted");
-    			}
-    		
-    			*/
     	} catch (Exception e){
     		System.out.println("MDT - Something went wrong in FOP conversion: error Stack: "+ e.getMessage());
     		e.printStackTrace();

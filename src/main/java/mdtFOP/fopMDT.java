@@ -68,7 +68,11 @@ public class fopMDT {
 					System.out.println("MDT - Inject articolo: "+ ((mdt.mdtBehaviours.nodeService.getProperty(nodeRef, ContentModel.PROP_DESCRIPTION) == null) ? "N/D" : mdt.mdtBehaviours.nodeService.getProperty(nodeRef, ContentModel.PROP_DESCRIPTION).toString()));
 					fo=StringUtils.replace(fo, "##articolo##",  ((mdt.mdtBehaviours.nodeService.getProperty(nodeRef, ContentModel.PROP_DESCRIPTION) == null) ? "N/D" : mdt.mdtBehaviours.nodeService.getProperty(nodeRef, ContentModel.PROP_DESCRIPTION).toString()));
 					System.out.println("MDT - Inject barcode data before PDF creation...");
-					barcode=StringUtils.replace(barcode, "MDTQRMDTQR", mdt.mdtBehaviours.nodeService.getProperty(nodeRef, ContentModel.PROP_NAME).toString());
+					if (!mdt.mdtBehaviours.nodeService.hasAspect(nodeRef, mdt.mdtBehaviours.ASPECT_MecaDocTrackMateriaGroupAspect)){
+						barcode=StringUtils.replace(barcode, "MDTQRMDTQR", mdt.mdtBehaviours.nodeService.getProperty(nodeRef, ContentModel.PROP_NAME).toString()+":p");
+					}else{
+						barcode=StringUtils.replace(barcode, "MDTQRMDTQR", mdt.mdtBehaviours.nodeService.getProperty(nodeRef, ContentModel.PROP_NAME).toString()+":m");
+					}
 					fo=StringUtils.replace(fo,"<fo:inline>mdtQRCODE</fo:inline>",barcode);
 					String tempFileName = String.valueOf(UUID.randomUUID())+".fo";
 					System.out.println("MDT - Begin fo transfomation on disk for file: " + foFile.getName());
