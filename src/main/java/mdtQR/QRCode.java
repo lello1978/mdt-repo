@@ -29,6 +29,7 @@ import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.GlobalHistogramBinarizer;
 import com.google.zxing.common.HybridBinarizer;
+import com.google.zxing.multi.qrcode.QRCodeMultiReader;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import com.google.zxing.qrcode.QRCodeReader;
  
@@ -65,20 +66,21 @@ public class QRCode {
 	    
 	  }
   
-  public static String readQRCode(BufferedImage image) throws Exception {
+  public static Result[] readQRCode(BufferedImage image) throws Exception {
 	  int[] degrees ={45,90,135,180,225,270,315};
 	  QRCodeReader reader = new QRCodeReader();
 	  Map<DecodeHintType,Object> hints = new EnumMap<>(DecodeHintType.class);
 	  //hints.put(DecodeHintType.CHARACTER_SET, StandardCharsets.UTF_8);
 	  hints.put(DecodeHintType.TRY_HARDER,Boolean.TRUE);
-	  Result result = null;
+	  Result[] results = null;
 	  System.out.println("MDT - ZXING starting finding QR code in image.");
 	  LuminanceSource source = new BufferedImageLuminanceSource(image);
 	  BinaryBitmap bitmap = new BinaryBitmap(new GlobalHistogramBinarizer(source));
+	  QRCodeMultiReader multiReader = new QRCodeMultiReader();
 	  try{
-		  result = reader.decode(bitmap,hints);
+		  results = multiReader.decodeMultiple(bitmap,hints);
 		  System.out.println("MDT - ZXING There is a QR code in image!!!");
-		  return result.getText();
+		  return results;
 	  }
 	  catch (ReaderException e){
 		  System.out.println("MDT - ZXING Exception with 0 degree detection.");
@@ -90,11 +92,11 @@ public class QRCode {
 				  try {		
 					  source=source.rotateCounterClockwise45();
 					  bitmap = new BinaryBitmap(new GlobalHistogramBinarizer(source));
-					  result = reader.decode(bitmap,hints);
+					  results = multiReader.decodeMultiple(bitmap,hints);
 					  System.out.println("MDT - ZXING There is a QR code in image!!! QR Code discovered with rotation : " + d + " degrees");
-					  System.out.println("MDT - ZXING Barocde format detected : " + result.getBarcodeFormat().name());
-					  System.out.println("MDT - ZXING Barocde UTF-8 string detected : " + result.getText());
-					  return result.getText();
+					  System.out.println("MDT - ZXING Barocde format detected : " + results.toString());
+					  System.out.println("MDT - ZXING Barocde UTF-8 string detected : " + results.toString());
+					  return results;
 				  } catch (ReaderException ex) {
 					  //the data is improperly formatted
 					  System.out.println("MDT - ZXING exception on search QR with image rotation with " + d + " degrees");
