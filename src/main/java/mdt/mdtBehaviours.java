@@ -24,6 +24,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -137,12 +138,15 @@ NodeServicePolicies.OnDeleteNodePolicy {
      * @param nodeRef           the node reference
      * @param aspectTypeQName   the qname of the aspect being applied
      */
-	public String[] QRs;
+	public String QRs[] = new String[]{};
 	
     public void onAddAspect(NodeRef nodeRef, QName aspectTypeQName){
+    	QRs = new String[0];
+    	Arrays.fill(QRs, null);
     	System.out.println("MDT - OnAddAspectPolicy Fired" + " NodeRef: "+ nodeRef.getId() +" Aspect: "+ aspectTypeQName.getLocalName());
     	ContentReader reader=null;
     	InputStream is=null;
+    	
     	
     	if(fileFolderService.getFileInfo(nodeRef).isFolder()==false){
     	 reader = contentService.getReader(nodeRef, ContentModel.PROP_CONTENT);
@@ -181,15 +185,15 @@ NodeServicePolicies.OnDeleteNodePolicy {
  					
  				
  				//Set QRInfoString to QR code value.	
- 				mdtBehaviours.nodeService.setProperty(nodeRef, PROP_QRInfoString,qr);
+ 				mdtBehaviours.nodeService.setProperty(nodeRef, PROP_QRInfoString,QRs[0].split(":")[0]);
  				//Search destination folder based on QR value
  				System.out.println("MDT - Search for match between QR and MDT destination folder name.");
  				System.out.println("MDT - Search for matching under path: " + "/app:company_home/st:sites/cm:" + siteID + "/cm:documentLibrary/cm:PRODUZIONE");
  				if (rs.length()>=1){
- 					if(QRs[0].split(":")[1]=="p"){
+ 					if(QRs[0].split(":")[1].equals("p")){
  					System.out.println("MDT - Search for matching with folders PRODUZIONE."); 
  					destFolderRef = mdtBehaviours.fileFolderService.searchSimple(rs.getNodeRef(0), QRs[0].split(":")[0]);
- 					}else if (QRs[0].split(":")[1]=="m"){
+ 					}else if (QRs[0].split(":")[1].equals("m")){
  						System.out.println("MDT - Search for matching with folders MATERIA."); 
  						rs = searchService.query(storeRef, SearchService.LANGUAGE_XPATH, "/app:company_home/st:sites/cm:" + siteID + "/cm:documentLibrary/cm:MATERIA");
  						destFolderRef = mdtBehaviours.fileFolderService.searchSimple(rs.getNodeRef(0), QRs[0].split(":")[0]);
@@ -226,11 +230,11 @@ NodeServicePolicies.OnDeleteNodePolicy {
  					String dfP=null;
  					String dfM=null;
  					for (String code:QRs){
- 						if (code.split(":")[1]=="p"){
+ 						if (code.split(":")[1].equals("p")){
  							dfP=code.split(":")[0];
  							System.out.println("MDT - PRODUZIONE folder code:" + dfP);
  						}
- 						if (code.split(":")[1]=="m"){
+ 						if (code.split(":")[1].equals("m")){
  							dfM=code.split(":")[0];
  							System.out.println("MDT - MATERIA folder code:" + dfM);
  					  }
@@ -259,10 +263,12 @@ NodeServicePolicies.OnDeleteNodePolicy {
 					if (destMateriaFolderRef!=null){
 						System.out.println("MDT - QR Matching FOUND on MATERIA folder Id:" + destFolderRef.getId());
 						QName PROP_listaMaterie = QName.createQName("http://www.lc.com/model/mdt/1.0", "listaMaterie");
-						String[] values=StringUtils.split((String) nodeService.getProperty(destMateriaFolderRef, PROP_listaMaterie),",");
-						ArrayUtils.add(values,dfP);
+						String[] values=StringUtils.split(((String) nodeService.getProperty(destMateriaFolderRef, PROP_listaMaterie)).replace("[","").replace("]", ""),",");
+						values=(String[]) ArrayUtils.add(values,dfP);
+						String lista= StringUtils.join(values,",");
+						lista="["+lista+"]";
 						System.out.println("MDT - Add PRODUZIONE folder value as string to listaMaterie property in METERIA FOLDER "+ dfM +" .");
-					    nodeService.setProperty(destMateriaFolderRef, PROP_listaMaterie, values);
+					    nodeService.setProperty(destMateriaFolderRef, PROP_listaMaterie, lista);
 					}
  					//if destination is found, move the file to this folder 
  					mdtBehaviours.nodeService.setProperty(nodeRef,ContentModel.PROP_DESCRIPTION,mdtBehaviours.fileFolderService.getFileInfo(nodeRef).getName()); 
@@ -409,12 +415,15 @@ NodeServicePolicies.OnDeleteNodePolicy {
 		}
 		finally
 		{
-			if( document != null )
-			{
-				document.close();
+			if( (document != null)){
+				try {	
+					document.close();
+			}catch (Exception e) {
+			
 			}
 
 		}
+			}
 		System.out.println("MDT - extractQRfromPDF finished. QR code string : " + QR);
 		return QR;
     }
@@ -450,7 +459,7 @@ NodeServicePolicies.OnDeleteNodePolicy {
                     
                     results=QRCode.readQRCode(image.getRGBImage());
                     for (Result r : results ){
-                    	ArrayUtils.add(QRs, r.getText());
+                    	QRs=(String[]) ArrayUtils.add(QRs, r.getText());
                     }
                     if (QRs.length>=2){break;};
                     

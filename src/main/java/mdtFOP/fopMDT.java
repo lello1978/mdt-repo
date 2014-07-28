@@ -72,9 +72,9 @@ public class fopMDT {
 					ChildAssociationRef childAssociationRef = mdt.mdtBehaviours.nodeService.getPrimaryParent(nodeRef);
 					NodeRef parent = childAssociationRef.getParentRef();
 					String parentName= mdt.mdtBehaviours.nodeService.getProperty(parent,ContentModel.PROP_NAME).toString();
-					if (parentName=="PRODUZIONE"){
+					if (parentName.equals("PRODUZIONE")){
 						barcode=StringUtils.replace(barcode, "MDTQRMDTQR", mdt.mdtBehaviours.nodeService.getProperty(nodeRef, ContentModel.PROP_NAME).toString()+":p");
-					}else if (parentName=="MATERIA"){
+					}else if (parentName.equals("MATERIA")){
 						barcode=StringUtils.replace(barcode, "MDTQRMDTQR", mdt.mdtBehaviours.nodeService.getProperty(nodeRef, ContentModel.PROP_NAME).toString()+":m");
 					}
 					fo=StringUtils.replace(fo,"<fo:inline>mdtQRCODE</fo:inline>",barcode);

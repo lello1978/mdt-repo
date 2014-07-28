@@ -68,7 +68,7 @@ public class QRCode {
   
   public static Result[] readQRCode(BufferedImage image) throws Exception {
 	  int[] degrees ={45,90,135,180,225,270,315};
-	  QRCodeReader reader = new QRCodeReader();
+	  //QRCodeReader reader = new QRCodeReader();
 	  Map<DecodeHintType,Object> hints = new EnumMap<>(DecodeHintType.class);
 	  //hints.put(DecodeHintType.CHARACTER_SET, StandardCharsets.UTF_8);
 	  hints.put(DecodeHintType.TRY_HARDER,Boolean.TRUE);
