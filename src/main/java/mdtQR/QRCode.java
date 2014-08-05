@@ -18,6 +18,9 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
+
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.DecodeHintType;
 import com.google.zxing.EncodeHintType;
@@ -32,83 +35,112 @@ import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.multi.qrcode.QRCodeMultiReader;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import com.google.zxing.qrcode.QRCodeReader;
- 
+
 public class QRCode {
- 
-  public static void main(String[] args) throws WriterException, IOException,NotFoundException {
-    Map<EncodeHintType, ErrorCorrectionLevel> hintMap = new HashMap<EncodeHintType, ErrorCorrectionLevel>();
-    hintMap.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.L);
- 
 
-  }
- 
-  
-  public static String readQRCode(InputStream is, String charset, Map<?, ?> hintMap) throws FileNotFoundException, IOException, NotFoundException {
-	   
-	  //get the data from the input stream
-	  BufferedImage image = ImageIO.read(is);
-	  //convert the image to a binary bitmap source
-	  LuminanceSource source = new BufferedImageLuminanceSource(image);
-	  BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
-	  //decode the barcode
-	  QRCodeReader reader = new QRCodeReader();
+	public static void main(String[] args) throws WriterException, IOException,NotFoundException {
+		Map<EncodeHintType, ErrorCorrectionLevel> hintMap = new HashMap<EncodeHintType, ErrorCorrectionLevel>();
+		hintMap.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.L);
 
-	  Result result;
-	  try {
-	    result = reader.decode(bitmap);
-	    return result.getText();
-	  } catch (ReaderException e) {
-	   //the data is improperly formatted
-	  			e.printStackTrace();
-	  			return null;
-	  }
-	    //qrCodeResult. .decode(is,hintMap);
-	    
-	  }
-  
-  public static Result[] readQRCode(BufferedImage image) throws Exception {
-	  int[] degrees ={45,90,135,180,225,270,315};
-	  //QRCodeReader reader = new QRCodeReader();
-	  Map<DecodeHintType,Object> hints = new EnumMap<>(DecodeHintType.class);
-	  //hints.put(DecodeHintType.CHARACTER_SET, StandardCharsets.UTF_8);
-	  hints.put(DecodeHintType.TRY_HARDER,Boolean.TRUE);
-	  Result[] results = null;
-	  System.out.println("MDT - ZXING starting finding QR code in image.");
-	  LuminanceSource source = new BufferedImageLuminanceSource(image);
-	  BinaryBitmap bitmap = new BinaryBitmap(new GlobalHistogramBinarizer(source));
-	  QRCodeMultiReader multiReader = new QRCodeMultiReader();
-	  try{
-		  results = multiReader.decodeMultiple(bitmap,hints);
-		  System.out.println("MDT - ZXING There is a QR code in image!!!");
-		  return results;
-	  }
-	  catch (ReaderException e){
-		  System.out.println("MDT - ZXING Exception with 0 degree detection.");
-		  e.printStackTrace();
-		  System.out.println("MDT - ZXING Cannot find QR code in image. Continue with rotation.");
-		  if (source.isRotateSupported()==true){
-			  for (int d:degrees){
-				  System.out.println("MDT - Rotating Image " + d + " degrees");
-				  try {		
-					  source=source.rotateCounterClockwise45();
-					  bitmap = new BinaryBitmap(new GlobalHistogramBinarizer(source));
-					  results = multiReader.decodeMultiple(bitmap,hints);
-					  System.out.println("MDT - ZXING There is a QR code in image!!! QR Code discovered with rotation : " + d + " degrees");
-					  System.out.println("MDT - ZXING Barocde format detected : " + results.toString());
-					  System.out.println("MDT - ZXING Barocde UTF-8 string detected : " + results.toString());
-					  return results;
-				  } catch (ReaderException ex) {
-					  //the data is improperly formatted
-					  System.out.println("MDT - ZXING exception on search QR with image rotation with " + d + " degrees");
-					  ex.printStackTrace();
-				  }
-			  }
-		  } else { System.out.println("MDT - Rotation not supported on Image - ZXING exiting");}
-		  
-	  }
-	  return null;
-	  
-  }
 
+	}
+
+
+	public static String readQRCode(InputStream is, String charset, Map<?, ?> hintMap) throws FileNotFoundException, IOException, NotFoundException {
+
+		//get the data from the input stream
+		BufferedImage image = ImageIO.read(is);
+		//convert the image to a binary bitmap source
+		LuminanceSource source = new BufferedImageLuminanceSource(image);
+		BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
+		//decode the barcode
+		QRCodeReader reader = new QRCodeReader();
+
+		Result result;
+		try {
+			result = reader.decode(bitmap);
+			return result.getText();
+		} catch (ReaderException e) {
+			//the data is improperly formatted
+			e.printStackTrace();
+			return null;
+		}
+		//qrCodeResult. .decode(is,hintMap);
+
+	}
+
+	public static Result[] readQRCode(BufferedImage image) throws Exception {
+		int[] degrees ={45,90,135,180,225,270,315};
+		//QRCodeReader reader = new QRCodeReader();
+		Map<DecodeHintType,Object> hints = new EnumMap<>(DecodeHintType.class);
+		//hints.put(DecodeHintType.CHARACTER_SET, StandardCharsets.UTF_8);
+		hints.put(DecodeHintType.TRY_HARDER,Boolean.TRUE);
+		Result[] results = null;
+		Result[] allResults = null;
+		LuminanceSource source = new BufferedImageLuminanceSource(image);
+		BinaryBitmap bitmap = new BinaryBitmap(new GlobalHistogramBinarizer(source));
+		QRCodeMultiReader multiReader = new QRCodeMultiReader();
+
+
+		System.out.println("MDT - ZXING (readQRCode) starting finding QR code in image with 0 degree.");
+		try{ 
+			results = multiReader.decodeMultiple(bitmap,hints);	
+			allResults=(Result[]) ArrayUtils.addAll(allResults,results);
+			System.out.println("MDT - ZXING (readQRCode) There is a QR code in image with 0 degree!!!");
+
+		}  catch (ReaderException ex){
+			System.out.println("MDT - ZXING (readQRCode) Exception with 0 degree detection.");
+			System.out.println("MDT - ZXING (readQRCode) Cannot find QR code in image. Continue with rotation. Error Stack Trace:");
+			ex.printStackTrace();
+		}
+
+		if (source.isRotateSupported()==true){
+			for (int d:degrees){
+				System.out.println("MDT - ZXING (readQRCode) Rotating Image " + d + " degrees");
+				try {		
+					source=source.rotateCounterClockwise45();
+					bitmap = new BinaryBitmap(new GlobalHistogramBinarizer(source)); 
+					allResults=(Result[])ArrayUtils.addAll(allResults, multiReader.decodeMultiple(bitmap,hints));
+					System.out.println("MDT - ZXING (readQRCode) There is a QR code in image!!! QR Code discovered with rotation : " + d + " degrees");					
+				} catch (ReaderException ex) {
+					//the data is improperly formatted
+					System.out.println("MDT - ZXING (readQRCode) exception on search QR with image rotation with " + d + " degrees. Error Stack Trace:");
+					ex.printStackTrace();
+				}
+			}
+		} else { System.out.println("MDT - Rotation not supported on Image - ZXING exiting");}
+		allResults=findDistinctQR(allResults);
+		if (allResults!=null){
+			
+			System.out.println("MDT - ZXING (readQRCode) Ending readQRcode with " + allResults.length+" code found: ");
+			for (Result r : allResults){
+				System.out.println("MDT - ZXING (readQRCode) format of Barcodes: " + r.getBarcodeFormat());
+				System.out.println("MDT - ZXING (readQRCode) Barocde UTF-8 string detected : " + r.getText());
+			}
+			return allResults;
+		}else {
+			System.out.println("MDT - ZXING (readQRCode) - NO BARCODE DETECTED.");
+			return null;
+			}
+
+
+	}
+	public static Result[] findDistinctQR(Result[] results){
+		Result[] r=null;
+        for(int i=0;i<results.length;i++){
+            boolean isDistinct = false;
+            for(int j=0;j<i;j++){
+                if(results[i].getText().equals(results[j].getText())){
+                    isDistinct = true;
+                    break;
+                }
+            }
+            if(!isDistinct){
+               r=(Result[])ArrayUtils.add(r,results[i]);
+               //System.out.print(arr[i]+" ");
+            }
+        }
+        return r;
+    }
 
 }

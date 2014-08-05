@@ -22,6 +22,21 @@
             <overrides/>
             <mandatory-aspects/>
         </type>
+        <type name="mdt:qrLabel">
+            <title>MecaDocTrack QR label document</title>
+            <parent>cm:content</parent>
+             <properties>
+                <property name="mdt:qrLabelType">
+                    <title>QR tipo di etichetta QR</title>
+                    <type>d:text</type>
+                    <mandatory>false</mandatory>
+                    <index enabled="true"/>
+                </property>
+            </properties>
+            <associations/>
+            <overrides/>
+            <mandatory-aspects/>
+        </type>
         <type name="mdt:folderLotto">
             <title>MecaDocTrack folder Lotto</title>
             <parent>mdt:folder</parent>
