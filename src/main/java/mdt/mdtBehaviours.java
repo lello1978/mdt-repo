@@ -179,35 +179,35 @@ NodeServicePolicies.OnDeleteNodePolicy {
 			System.out.println("MDT - Extract image from file content for QR searching");
 			qr = extractQRfromPDF(is);
 			if (QRs != null) {
- 				System.out.println("MDT - QR codes find. Code: '"+StringUtils.join(QRs,",")+"' Try to put content in referred MDT folder....");
+ 				//System.out.println("MDT - QR codes find. Code: '"+StringUtils.join(QRs,"; ")+"' Try to put content in referred MDT folders....");
  				if (QRs.length==1){
- 					System.out.println("MDT - QR codes find single Code: '"+QRs[0]+"' Try to put content in referred MDT folder.");
+ 					System.out.println("MDT - (SingleQRDestination) QR codes find single Code: '"+QRs[0]+"' Try to put content in referred MDT folder.");
  					
  				
  				//Set QRInfoString to QR code value.	
  				mdtBehaviours.nodeService.setProperty(nodeRef, PROP_QRInfoString,QRs[0].split(":")[0]);
  				//Search destination folder based on QR value
- 				System.out.println("MDT - Search for match between QR and MDT destination folder name.");
- 				System.out.println("MDT - Search for matching under path: " + "/app:company_home/st:sites/cm:" + siteID + "/cm:documentLibrary/cm:PRODUZIONE");
+ 				System.out.println("MDT - (SingleQRDestination) Search for match between QR and MDT destination folder name.");
+ 				//System.out.println("MDT - (SingleQRDestination) Search for matching under path: " + "/app:company_home/st:sites/cm:" + siteID + "/cm:documentLibrary/cm:PRODUZIONE");
  				if (rs.length()>=1){
  					if ((QRs[0].split(":").length)>1){
  					if(QRs[0].split(":")[1].equals("p")){
- 					System.out.println("MDT - Search for matching with folders PRODUZIONE."); 
+ 					System.out.println("MDT - (SingleQRDestination) QR code is PRODUZIONE type. Search for matching with folders PRODUZIONE."); 
  					destFolderRef = mdtBehaviours.fileFolderService.searchSimple(rs.getNodeRef(0), QRs[0].split(":")[0]);
  					}else if (QRs[0].split(":")[1].equals("m")){
- 						System.out.println("MDT - Search for matching with folders MATERIA."); 
+ 						System.out.println("MDT - (SingleQRDestination) QRcode is MATERIA type. Search for matching with folders MATERIA."); 
  						rs = searchService.query(storeRef, SearchService.LANGUAGE_XPATH, "/app:company_home/st:sites/cm:" + siteID + "/cm:documentLibrary/cm:MATERIA");
  						destFolderRef = mdtBehaviours.fileFolderService.searchSimple(rs.getNodeRef(0), QRs[0].split(":")[0]);
  						
  					}
  					}else{
- 						System.out.println("MDT - Legacy QR found without tag (p/m) split. Search for matching with folders only in PRODUZIONE."); 
+ 						System.out.println("MDT - (SingleQRDestination) Legacy QR found without tag (p/m) split. Search for matching with folders only in PRODUZIONE."); 
  	 					destFolderRef = mdtBehaviours.fileFolderService.searchSimple(rs.getNodeRef(0), QRs[0]);
  					}
  					
  				}
  				if (destFolderRef!=null){
- 					System.out.println("MDT - QR Matching FOUND on MDT folder Id:" + destFolderRef.getId());
+ 					System.out.println("MDT - (SingleQRDestination) QR folder matching FOUND on MDT folder Id:" + destFolderRef.getId());
  					//if destination is found, move the file to this folder 
  					mdtBehaviours.nodeService.setProperty(nodeRef,ContentModel.PROP_DESCRIPTION,mdtBehaviours.fileFolderService.getFileInfo(nodeRef).getName()); 
  					Map<QName,Serializable> aspectValues = new HashMap<QName,Serializable>();
@@ -215,10 +215,10 @@ NodeServicePolicies.OnDeleteNodePolicy {
  					mdtBehaviours.nodeService.addAspect(nodeRef, ASPECT_MecaDocTrackElementIDAspect,aspectValues);
  					mdtBehaviours.fileFolderService.move(nodeRef,destFolderRef, nodeRef.getId());
  					
- 					System.out.println("MDT - QR Code discovered, applyed to QRInfoString properties, and moved to correct destination folder: "+mdtBehaviours.fileFolderService.getFileInfo(destFolderRef).getName());
+ 					System.out.println("MDT - (SingleQRDestination) QR Code discovered, QRInfoString properties applyed and moved to correct destination folder: "+mdtBehaviours.fileFolderService.getFileInfo(destFolderRef).getName());
  				 } else {
  					 //if Destination folder is NOT found i move file in the SMTP error path and property QRInfoString is set to DEST NOT FOUND
- 					System.out.println("MDT - QR Matching NOT found. Moving document to "+"/app:company_home/st:sites/cm:mdtadmin/cm:documentLibrary/cm:smtpRouter/cm:"+siteID+"SMTP/cm:error");
+ 					System.out.println("MDT - (SingleQRDestination) QR Matching NOT found. Moving document to "+"/app:company_home/st:sites/cm:mdtadmin/cm:documentLibrary/cm:smtpRouter/cm:"+siteID+"SMTP/cm:error");
  					rs = searchService.query(storeRef, SearchService.LANGUAGE_XPATH, "/app:company_home/st:sites/cm:mdtadmin/cm:documentLibrary/cm:smtpRouter/cm:"+siteID+"SMTP/cm:error");
  					if (rs.length()>=1) destFolderRef = rs.getNodeRef(0);
  	 				
@@ -229,43 +229,49 @@ NodeServicePolicies.OnDeleteNodePolicy {
  				 }				
  			
  				}else	if (QRs.length>1){
- 					System.out.println("MDT - FOUND MULTIPLE QR Code: '"+StringUtils.join(QRs,";")+"' Iterate trought QRs codes.");
+ 					System.out.println("MDT - (MultiQRDestination) FOUND MULTIPLE QR Code: '"+StringUtils.join(QRs,";")+"' Iterate trought QRs codes.");
  					String dfP=null;
  					String dfM=null;
  					for (String code:QRs){
- 						if (code.split(":")[1].equals("p")){
- 							dfP=code.split(":")[0];
- 							System.out.println("MDT - PRODUZIONE folder code:" + dfP);
- 						}
- 						if (code.split(":")[1].equals("m")){
- 							dfM=code.split(":")[0];
- 							System.out.println("MDT - MATERIA folder code:" + dfM);
- 					  }
- 						
+ 						if (code.split(":").length>1){
+ 							if (code.split(":")[1].equals("p")){
+ 								dfP=code.split(":")[0];
+ 								System.out.println("MDT - (MultiQRDestination) PRODUZIONE folder code:" + dfP);
+ 							}
+ 							if (code.split(":")[1].equals("m")){
+ 								dfM=code.split(":")[0];
+ 								System.out.println("MDT - (MultiQRDestination) MATERIA folder code:" + dfM);
+ 							}
+ 						}else{
+ 							dfP=code;
+ 							System.out.println("MDT - (MultiQRDestination) Legacy PRODUZIONE folder code:" + dfP);
+ 							
+ 							}
+
  					}
  				
  				//Set QRInfoString to QR code value.	
  				mdtBehaviours.nodeService.setProperty(nodeRef, PROP_QRInfoString,dfP);
  				//Search destination folder based on QR value
- 				System.out.println("MDT - Search for match between QR and PRODUZIONE folder name.");
- 				System.out.println("MDT - Search for matching under path: " + "/app:company_home/st:sites/cm:" + siteID + "/cm:documentLibrary/cm:PRODUZIONE");
+ 				System.out.println("MDT - (MultiQRDestination) Search for match between QR and PRODUZIONE folder name.");
+ 				System.out.println("MDT - (MultiQRDestination) Search for matching under path: " + "/app:company_home/st:sites/cm:" + siteID + "/cm:documentLibrary/cm:PRODUZIONE");
  				if (rs.length()>=1){
- 					System.out.println("MDT - Search for matching with folders PRODUZIONE."); 
+ 					System.out.println("MDT - (MultiQRDestination) Search for matching with folders PRODUZIONE."); 
  					destFolderRef = mdtBehaviours.fileFolderService.searchSimple(rs.getNodeRef(0), dfP);
  				}
  				if (destFolderRef!=null){
- 					System.out.println("MDT - QR Matching FOUND on MDT PRODUZIONE folder Id:" + destFolderRef.getId());
- 					System.out.println("MDT - Search for matching and associating with folders MATERIA."); 
+ 					System.out.println("MDT - (MultiQRDestination) QR Matching FOUND on MDT PRODUZIONE folder Id:" + destFolderRef.getId());
+ 					System.out.println("MDT - (MultiQRDestination) Search for matching and associating with folders MATERIA."); 
 					rs = searchService.query(storeRef, SearchService.LANGUAGE_XPATH, "/app:company_home/st:sites/cm:" + siteID + "/cm:documentLibrary/cm:MATERIA");
 					NodeRef destMateriaFolderRef = mdtBehaviours.fileFolderService.searchSimple(rs.getNodeRef(0), dfM);
 					if (destMateriaFolderRef!=null){
-						System.out.println("MDT - QR Matching FOUND on MATERIA folder Id:" + destFolderRef.getId());
+						System.out.println("MDT - (MultiQRDestination) QR Matching FOUND on MATERIA folder Id:" + destMateriaFolderRef.getId());
 						QName PROP_listaMaterie = QName.createQName("http://www.lc.com/model/mdt/1.0", "listaMaterie");
 						String[] values=StringUtils.split(((String) nodeService.getProperty(destMateriaFolderRef, PROP_listaMaterie)).replace("[","").replace("]", ""),",");
 						values=(String[]) ArrayUtils.add(values,dfP);
 						String lista= StringUtils.join(values,",");
 						lista="["+lista+"]";
-						System.out.println("MDT - Add PRODUZIONE folder value as string to listaMaterie property in METERIA FOLDER "+ dfM +" .");
+						System.out.println("MDT - (MultiQRDestination) Add PRODUZIONE folder values as string to listaMaterie property in METERIA FOLDER "+ dfM +" . Value now is: "+ lista);
 					    nodeService.setProperty(destMateriaFolderRef, PROP_listaMaterie, lista);
 					}
  					//if destination is found, move the file to this folder 
@@ -275,16 +281,16 @@ NodeServicePolicies.OnDeleteNodePolicy {
  					mdtBehaviours.nodeService.addAspect(nodeRef, ASPECT_MecaDocTrackElementIDAspect,aspectValues);
  					mdtBehaviours.fileFolderService.move(nodeRef,destFolderRef, nodeRef.getId());
  					
- 					System.out.println("MDT - MULTIPLE QR Codes discovered, applyed to QRInfoString properties, and moved to correct destination folder: "+mdtBehaviours.fileFolderService.getFileInfo(destFolderRef).getName());
+ 					System.out.println("MDT - (MultiQRDestination) MULTIPLE QR Codes discovered, associate materia informations, applyed QRInfoString properties, and moved to correct destination folder: "+mdtBehaviours.fileFolderService.getFileInfo(destFolderRef).getName());
  				 } else {
  					 //if Destination folder is NOT found i move file in the SMTP error path and property QRInfoString is set to DEST NOT FOUND
- 					System.out.println("MDT - MULTIPLE QR Matching NOT found. Moving document to "+"/app:company_home/st:sites/cm:mdtadmin/cm:documentLibrary/cm:smtpRouter/cm:"+siteID+"SMTP/cm:error");
+ 					System.out.println("MDT - (MultiQRDestination) MULTIPLE QR Matching NOT found. Moving document to "+"/app:company_home/st:sites/cm:mdtadmin/cm:documentLibrary/cm:smtpRouter/cm:"+siteID+"SMTP/cm:error");
  					rs = searchService.query(storeRef, SearchService.LANGUAGE_XPATH, "/app:company_home/st:sites/cm:mdtadmin/cm:documentLibrary/cm:smtpRouter/cm:"+siteID+"SMTP/cm:error");
  					if (rs.length()>=1) destFolderRef = rs.getNodeRef(0);
  	 				
  	 				mdtBehaviours.nodeService.setProperty(nodeRef,ContentModel.PROP_DESCRIPTION,mdtBehaviours.fileFolderService.getFileInfo(nodeRef).getName()); 
  	 				mdtBehaviours.fileFolderService.move(nodeRef,destFolderRef,nodeRef.getId());
- 	 				System.out.println("MDT - Unrecognized content moved in error folder. Set QRInfoString properties to \"DEST NOT FOUND\" ");
+ 	 				System.out.println("MDT - (MultiQRDestination) Unrecognized content moved in error folder. Set QRInfoString properties to \"DEST NOT FOUND\" ");
  					mdtBehaviours.nodeService.setProperty(nodeRef, PROP_QRInfoString,"QRCODE: "+QRs[0].split(":")[0]+" - ERROR: DEST NOT FOUND"); 
  				 }
  								
@@ -294,13 +300,13 @@ NodeServicePolicies.OnDeleteNodePolicy {
  								
  				}else{
  				//if QR is null the file is moved to SMTP error folder and the properties QRInfoString is set to QR NOT FOUND
- 				System.out.println("MDT - MULTIPLE QR code NOT found on document. Moving document to "+"/app:company_home/st:sites/cm:mdtadmin/cm:documentLibrary/cm:smtpRouter/cm:"+siteID+"SMTP/cm:error");
+ 				System.out.println("MDT - (NullQR) QR code NOT found on document. Moving document to "+"/app:company_home/st:sites/cm:mdtadmin/cm:documentLibrary/cm:smtpRouter/cm:"+siteID+"SMTP/cm:error");
  				rs = searchService.query(storeRef, SearchService.LANGUAGE_XPATH, "/app:company_home/st:sites/cm:mdtadmin/cm:documentLibrary/cm:smtpRouter/cm:"+siteID+"SMTP/cm:error");
  				if (rs.length()>=1) destFolderRef = rs.getNodeRef(0);
  				
  				mdtBehaviours.nodeService.setProperty(nodeRef,ContentModel.PROP_DESCRIPTION,mdtBehaviours.fileFolderService.getFileInfo(nodeRef).getName()); 
  				mdtBehaviours.fileFolderService.move(nodeRef,destFolderRef,nodeRef.getId());
- 				System.out.println("MDT - Unrecognized content moved in error folder. Set QRInfoString properties to \"DEST NOT FOUND\" ");
+ 				System.out.println("MDT - (NullQR) Unrecognized content moved in error folder. Set QRInfoString properties to \"QR NOT FOUND\" ");
  				mdtBehaviours.nodeService.setProperty(nodeRef, PROP_QRInfoString,"QR NOT FOUND"); 
  			}
 			
@@ -309,18 +315,18 @@ NodeServicePolicies.OnDeleteNodePolicy {
 		} catch (Exception e) {
 			// Simply skip the QR extraction if error occurs.
 			//TODO: Add alerting by email if QR code cannot be found.
-			System.out.println("MDT - Error with exception on QR reading with ZXING. "+ e.toString());
+			System.out.println("MDT - (QRReaderOnBehaviourException) Error with exception on QR reading inside behaviours. "+ e.toString());
 			e.printStackTrace();
 			try{
-				System.out.println("MDT - QR code NOT found on document. Moving document to "+"/app:company_home/st:sites/cm:mdtadmin/cm:documentLibrary/cm:smtpRouter/cm:"+siteID+"SMTP/cm:error");
+				System.out.println("MDT - (QRReaderOnBehaviourException) QR code NOT found on document. Moving document to "+"/app:company_home/st:sites/cm:mdtadmin/cm:documentLibrary/cm:smtpRouter/cm:"+siteID+"SMTP/cm:error");
 				rs = searchService.query(storeRef, SearchService.LANGUAGE_XPATH, "/app:company_home/st:sites/cm:mdtadmin/cm:documentLibrary/cm:smtpRouter/cm:"+siteID+"SMTP/cm:error");
 				if (rs.length()>=1) destFolderRef = rs.getNodeRef(0);				
 				mdtBehaviours.nodeService.setProperty(nodeRef,ContentModel.PROP_DESCRIPTION,mdtBehaviours.fileFolderService.getFileInfo(nodeRef).getName()); 
 				mdtBehaviours.fileFolderService.move(nodeRef,destFolderRef, nodeRef.getId());
-				System.out.println("MDT - Error on QR procedure. Set QRInfoString properties to \"QR NOT FOUND OR ZXING EXCEPTION\" ");
+				System.out.println("MDT (QRReaderOnBehaviourException) Error on QR procedure. Set QRInfoString properties to \"QR NOT FOUND OR ZXING EXCEPTION\" ");
 				mdtBehaviours.nodeService.setProperty(nodeRef, PROP_QRInfoString,"QR NOT FOUND OR ZXING EXCEPTION"); 
 			} catch(Exception f){
-				System.out.println("MDT - [SEVERE ERROR] Error on QR procedure. Something went wrong.");
+				System.out.println("MDT (QRReaderOnBehaviourException) [SEVERE ERROR] Error on QR procedure. Something went wrong. We need to delete arrived content for security reason.");
 				f.printStackTrace();
 				fileFolderService.delete(nodeRef);				
 			}
