@@ -18,9 +18,6 @@
  */
 package mdt;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -32,7 +29,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import mdtQR.QRCode;
-import mdtFOP.fopMDT;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.ContentServicePolicies;
@@ -40,21 +36,23 @@ import org.alfresco.repo.node.NodeServicePolicies;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
+import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.model.FileFolderService;
-import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
-import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.cmr.site.SiteService;
 import org.alfresco.service.namespace.QName;
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.lucene.util.ArrayUtil;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDResources;
@@ -62,8 +60,6 @@ import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
 import org.apache.pdfbox.pdmodel.graphics.xobject.PDXObject;
 import org.apache.pdfbox.pdmodel.graphics.xobject.PDXObjectForm;
 import org.apache.pdfbox.pdmodel.graphics.xobject.PDXObjectImage;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
 
 import com.google.zxing.Result;
 
@@ -90,6 +86,9 @@ NodeServicePolicies.OnDeleteNodePolicy {
     public static ContentService contentService;
     public static SearchService searchService;
     public static FileFolderService fileFolderService;
+    public static SiteService siteService;
+    public static ActionService actionService;
+    public static ServiceRegistry serviceRegistry; 
     public static StoreRef storeRef=new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
     /* Aspect names */
     public static final QName ASPECT_QRInfoAspect = QName.createQName("http://www.lc.com/model/mdt/1.0", "QRInfoAspect");
@@ -523,5 +522,17 @@ NodeServicePolicies.OnDeleteNodePolicy {
     {
         mdtBehaviours.fileFolderService = fileFolderService;
     }
-
+    
+    public void setSiteService(SiteService siteService)
+    {
+        mdtBehaviours.siteService = siteService;
+    }
+    public void setServiceRegistry(ServiceRegistry serviceRegistry)
+    {
+        mdtBehaviours.serviceRegistry = serviceRegistry;
+    }
+    public void setActionService(ActionService actionService)
+    {
+        mdtBehaviours.actionService = actionService;
+    }
 }

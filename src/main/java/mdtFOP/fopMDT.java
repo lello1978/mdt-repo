@@ -20,7 +20,7 @@ import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.QName;
 import org.apache.myfaces.shared_impl.util.StringUtils;
 
-import ucar.unidata.util.StringUtil;
+import sendQRhelper.sendQr;
 
 /**
  * @author marcello
@@ -106,6 +106,9 @@ public class fopMDT {
 							writer.guessEncoding();
 							tempFile= new File(tempFileName+".pdf");
 							writer.putContent(tempFile);
+							QName TYPE_QNAME_qrLabel = QName.createQName("http://www.lc.com/model/mdt/1.0", "qrLabel");
+						    mdt.mdtBehaviours.nodeService.setType(pdf, TYPE_QNAME_qrLabel);
+						    mdt.mdtBehaviours.serviceRegistry.getPermissionService().setPermission(pdf, authority, permission, allow);
 						}
 					}catch (Exception e){
 						System.out.println("MDT - Something went wrong during FOP conversion: error Stack: "+ e.getMessage());
@@ -129,6 +132,17 @@ public class fopMDT {
 
 		} else { System.out.println("MDT - Skip QR creation on this behaviours because node is type:content");
 		}
+		try{
+			System.out.println("MDT - Sending email with QR labels to folder owner");
+			sendQr m = new sendQRhelper.sendQr(nodeRef);
+	        Thread t = new Thread(m);
+	        t.start();
+			//sendQrMail(nodeRef);
+		}catch(Exception e){
+			System.out.println("MDT - ERROR Sending email with QR labels to folder owner.");
+			e.printStackTrace();	
+		
+		}		
 	}
     			
 	
@@ -150,14 +164,5 @@ public static String readBarcodeXML(){
     return barcode;
 }
 
-
-
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
-	}
 
 }

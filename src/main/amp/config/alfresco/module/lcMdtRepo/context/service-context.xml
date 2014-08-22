@@ -46,6 +46,15 @@
         <property name="fileFolderService">
             <ref bean="fileFolderService" />
         </property>
+         <property name="siteService">
+            <ref bean="siteService" />
+        </property>
+         <property name="actionService">
+            <ref bean="actionService" />
+        </property>
+         <property name="serviceRegistry">
+            <ref bean="ServiceRegistry" />
+        </property>
     </bean>  
     
 </beans>
