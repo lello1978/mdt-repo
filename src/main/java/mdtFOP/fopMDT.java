@@ -108,8 +108,7 @@ public class fopMDT {
 							writer.putContent(tempFile);
 							QName TYPE_QNAME_qrLabel = QName.createQName("http://www.lc.com/model/mdt/1.0", "qrLabel");
 						    mdt.mdtBehaviours.nodeService.setType(pdf, TYPE_QNAME_qrLabel);
-						    mdt.mdtBehaviours.serviceRegistry.getPermissionService().setPermission(pdf, authority, permission, allow);
-						}
+						  }
 					}catch (Exception e){
 						System.out.println("MDT - Something went wrong during FOP conversion: error Stack: "+ e.getMessage());
 						e.printStackTrace();
