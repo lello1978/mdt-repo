@@ -1,8 +1,8 @@
 /*
- * Copyright (C) 2005-2012 Alfresco Software Limited.
+ * Copyright (C) 2014-2015 TIPINONCOMUNI SRLS.
  *
- * This file is part of Alfresco
- *
+ * This file is part of MECADOCTRACK.it PROJECT
+ * The project is based on ALfresco Community Edition.
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -16,8 +16,8 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
  */
-package mdt;
-
+package mdt; 
+ 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -65,9 +65,10 @@ import com.google.zxing.Result;
 
 /**
  * This class contains the behaviour behind the 'mdt:QRInfoAspect' aspect.
- * <p>
- * Every time tha this aspect is applied, the ZXING qr try to find the qr string to indentify QR text.
  * 
+ * Every time that this aspect is applied, the ZXING qr try to find the qr string to indentify QR text.
+ * The MDT QR if formed with prefix  
+ * TODO:
  * 
  * 
  * @author Marcello Modica
