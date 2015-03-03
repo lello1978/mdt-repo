@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model xmlns="http://www.alfresco.org/model/dictionary/1.0" name="doctrack:model">
+    <description>MecaDocTrack Content Model</description>
+    <author>lc</author>
+    <version>1.0</version>
+    <imports>
+        <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d"/>
+        <import uri="http://www.alfresco.org/model/content/1.0" prefix="cm"/>
+    </imports>
+    <namespaces>
+        <namespace uri="http://www.tipinoncomuni.com/model/doctrack/1.0" prefix="doctrack"/>
+    </namespaces>
+    <data-types/>
+    <constraints/>
+    <types />
+    <aspects>
+        <aspect name="doctrack:docTrackAspect">
+            <title>DocTrack Aspect</title>
+            <properties>
+                <property name="doctrack:QRS">
+                    <title>QR identificati sul PDF</title>
+                    <type>d:text</type>
+                    <mandatory>false</mandatory>
+                    <index enabled="true"/>
+                    <multiple>true</multiple>
+                </property>
+            </properties>
+            <associations/>
+            <overrides/>
+            <mandatory-aspects/>
+        </aspect>
+    </aspects>
+</model>

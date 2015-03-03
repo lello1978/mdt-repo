@@ -23,11 +23,19 @@
 	<bean id="${project.artifactId}_dictionaryBootstrap" parent="dictionaryModelBootstrap" depends-on="dictionaryBootstrap">
     	<property name="models">
         	<list>
-            	<value>alfresco/module/${project.artifactId}/model/mdtModel.xml</value>
+            	<value>alfresco/module/${project.artifactId}/model/docTrackModel.xml</value>
         	</list>
     	</property>
 	</bean>
-	
+	<!-- Registration of new models -->
+	 <bean id="Sudo" parent="baseJavaScriptExtension" class="org.tnc.alfresco.sudoUtils.Sudo">
+        <property name="extensionName">
+            <value>sudoUtils</value>
+        </property>
+       <property name="authorityService">
+             <ref bean="AuthorityService" />
+       </property>
+    </bean>
     
     <!-- mdtOCR Behaviour Bean -->
     <bean id="mdtBehaviours" class="mdt.mdtBehaviours" init-method="init">
