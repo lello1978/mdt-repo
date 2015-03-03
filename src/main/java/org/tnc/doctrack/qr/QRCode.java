@@ -6,7 +6,7 @@
  * @author Marcello Modica
  *
  */
-package mdtQR;
+package org.tnc.doctrack.qr;
 
 import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
@@ -19,7 +19,6 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
 
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.DecodeHintType;
