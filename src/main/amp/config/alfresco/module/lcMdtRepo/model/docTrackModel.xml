@@ -24,6 +24,13 @@
                     <index enabled="true"/>
                     <multiple>true</multiple>
                 </property>
+                <property name="doctrack:zxingError">
+                    <title>Errore rilevato QR zxing</title>
+                    <type>d:text</type>
+                    <mandatory>false</mandatory>
+                    <index enabled="true"/>
+                    <multiple>false</multiple>
+                </property>
             </properties>
             <associations/>
             <overrides/>

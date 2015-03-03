@@ -1,5 +1,7 @@
 /**
- * @author marcello
+ * @author marcello 03-03-2015
+ *  Gli utenti appartenenti al gruppo SUDOERS possono lanciare script come amministratori
+ *  Usare la sintassi da javascript: sudoUtils.sudo( function() );
  *
  */
 package org.tnc.alfresco.sudoUtils;
@@ -35,7 +37,7 @@ public class Sudo extends BaseScopableProcessorExtension {
  
         Set<String> groups = authorityService.getContainingAuthorities(AuthorityType.GROUP, user, false);
         if (!groups.contains("GROUP_SUDOERS"))
-            throw new Exception("MDT - User '" + user + "' cannot use sudo");
+            throw new Exception("TNC - DocTrack - User '" + user + "' cannot use sudo");
  
         RunAsWork<Object> raw = new RunAsWork<Object>() {
             public Object doWork() throws Exception {

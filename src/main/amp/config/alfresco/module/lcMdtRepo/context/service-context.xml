@@ -27,11 +27,15 @@
         	</list>
     	</property>
 	</bean>
-	<!-- Registration of new models -->
-	 <bean id="Sudo" parent="baseJavaScriptExtension" class="org.tnc.alfresco.sudoUtils.Sudo">
-        <property name="extensionName">
-            <value>sudoUtils</value>
-        </property>
+	
+	<!-- Registration of classes related to project -->
+	<!-- MM : 03-03-2015  -->
+	<!-- Registration of classes org.tnc.alfresco.sudoUtils -->
+	
+	<bean id="Sudo" parent="baseJavaScriptExtension" class="org.tnc.alfresco.sudoUtils.Sudo">
+       <property name="extensionName">
+           <value>sudoUtils</value>
+       </property>
        <property name="authorityService">
              <ref bean="AuthorityService" />
        </property>
