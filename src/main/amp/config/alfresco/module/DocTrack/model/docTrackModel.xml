@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model xmlns="http://www.alfresco.org/model/dictionary/1.0" name="doctrack:model">
-    <description>MecaDocTrack Content Model</description>
-    <author>lc</author>
+    <description>DocTrack Content Model</description>
+    <author>TNC</author>
     <version>1.0</version>
     <imports>
         <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d"/>
