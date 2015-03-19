@@ -4,7 +4,7 @@
  */
 /**
  * @author Marcello Modica
- *
+ * 19/03/2015-16:35
  */
 package org.tnc.doctrack.qr;
 
