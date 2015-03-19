@@ -23,7 +23,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -146,8 +146,9 @@ NodeServicePolicies.OnDeleteNodePolicy {
  				if (QRs.length>0){
  					System.out.println("TNC - DocTrack - find QR codes : '"+StringUtils.join(QRs,";")+"' Try to put content in referred node properties.");
  					//Set QRInfoString to QR code value.	
- 					List<String> qrList = new ArrayList<String>(Arrays.asList(QRs));
- 					docTrackBehaviours.nodeService.setProperty(nodeRef, PROP_QRS,(Serializable) qrList);
+ 					ArrayList<Serializable> qrList = new ArrayList<Serializable>(Arrays.asList(QRs));
+ 				
+ 					docTrackBehaviours.nodeService.setProperty(nodeRef, PROP_QRS,qrList);
  				}	
  			}
 		} catch (Exception e) {
@@ -270,6 +271,7 @@ NodeServicePolicies.OnDeleteNodePolicy {
                     
                     results=QRCode.readQRCode(image.getRGBImage());
                     for (Result r : results ){
+                    	System.out.println("TNC - DocTrack  - extractQRfromPDF - code discovered: " + r.getText());
                     	QRs=(String[]) ArrayUtils.add(QRs, r.getText());
                     }
                     if (QRs.length>=2){break;};
