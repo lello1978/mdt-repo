@@ -20,16 +20,16 @@
                 <property name="doctrack:QRS">
                     <title>QR identificati sul PDF</title>
                     <type>d:text</type>
-                    <mandatory>false</mandatory>
-                    <index enabled="true"/>
+                    <mandatory>false</mandatory>                    
                     <multiple>true</multiple>
+                    <index enabled="true"/>
                 </property>
                 <property name="doctrack:zxingError">
                     <title>Errore rilevato QR zxing</title>
                     <type>d:text</type>
                     <mandatory>false</mandatory>
-                    <index enabled="true"/>
                     <multiple>false</multiple>
+                    <index enabled="true"/>
                 </property>
             </properties>
             <associations/>

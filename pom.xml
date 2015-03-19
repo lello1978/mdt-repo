@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>TncDocTrack</groupId>
     <artifactId>TncDocTrack</artifactId>
-    <version>0.1.3</version>
+    <version>0.1.4</version>
     <name>TncDocTrack AMP project</name>
     <packaging>amp</packaging>
     <description>TncDocTrack AMP (Alfresco Module Package) Contain FOP e QR integration</description>

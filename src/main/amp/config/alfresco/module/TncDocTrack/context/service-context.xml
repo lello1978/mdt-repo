@@ -41,8 +41,8 @@
        </property>
     </bean>
     
-    <!-- mdtOCR Behaviour Bean -->
-    <bean id="mdtBehaviours" class="mdt.mdtBehaviours" init-method="init">
+    <!-- org.tnc.doctrack.behaviours.docTrackBehaviours Behaviour Bean -->
+    <bean id="TncDocTrack" class="org.tnc.doctrack.behaviours.docTrackBehaviours" init-method="init">
     	<property name="nodeService">
     		<ref bean="nodeService"/>
     	</property>
