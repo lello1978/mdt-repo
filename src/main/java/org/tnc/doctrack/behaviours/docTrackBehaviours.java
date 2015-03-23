@@ -24,9 +24,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.alfresco.model.ContentModel;
@@ -103,7 +105,7 @@ NodeServicePolicies.OnDeleteNodePolicy {
      */
  
 	public void init(){
-    			System.out.println("TNC - DocTrack - Behaviours AMP class loading....");
+    	System.out.println("TNC - DocTrack - Behaviours AMP class loading....");
 		if (logger.isDebugEnabled()) logger.debug("TNC - DocTrack - Initializing policy logger behavior"); 
 		docTrackBehaviours.policyComponent.bindClassBehaviour(NodeServicePolicies.OnAddAspectPolicy.QNAME,ASPECT_docTrackAspect,new JavaBehaviour(this, "onAddAspect", NotificationFrequency.FIRST_EVENT));
 		System.out.println("TNC - DocTrack - OnAddAspectPolicy Behaviours with Aspect docTrackAspect loaded");
@@ -119,7 +121,7 @@ NodeServicePolicies.OnDeleteNodePolicy {
      * @param nodeRef           the node reference
      * @param aspectTypeQName   the qname of the aspect being applied
      */
-	public ArrayList<String> QRs = new ArrayList<String>();
+	public ArrayList<Serializable> QRs =new ArrayList<Serializable>();
 	
     public void onAddAspect(NodeRef nodeRef, QName aspectTypeQName){
     	System.out.println("TNC - DocTrack - OnAddAspectPolicy Fired  -  " + " NodeRef: "+ nodeRef.getId() +"  -  Aspect: "+ aspectTypeQName.getLocalName());
@@ -133,7 +135,7 @@ NodeServicePolicies.OnDeleteNodePolicy {
  		}
    
  		com.google.zxing.Result[] qr=null;
- 		
+ 		QRs.clear();
     	if(aspectTypeQName.getLocalName().equals(ASPECT_docTrackAspect.getLocalName())){
     		System.out.println("TNC - DocTrack - Aspect docTrackAspect applied - behaviours fired");    		
  		try {
@@ -267,12 +269,14 @@ NodeServicePolicies.OnDeleteNodePolicy {
                     System.out.println(" TNC - DocTrack  - extractQRfromPDF - processResources - Extracted Image format - Suffix: "+ image.getSuffix() + " Height: "+ image .getHeight()+ " Widht: " + image.getWidth() );
                     image.write2file("qrImageInPDF_"+UUID.randomUUID().toString());
                     
-                    results=QRCode.readQRCode(image.getRGBImage());
+                    results=org.tnc.doctrack.qr.QRCode.readQRCode(image.getRGBImage());
                     for (Result r : results ){
                     	System.out.println("TNC - DocTrack  - extractQRfromPDF - code discovered: " + r.getText());
-                    	QRs.add(r.getText());
-                    	if (logger.isDebugEnabled()) System.out.println("TNC - DocTrack  - extractQRfromPDF - QRs arralist: " + r.getText());;
-                    	
+                    	//Set<String> set = new HashSet<String>();
+                    	//set.add(r.getText());
+                    	//if (logger.isDebugEnabled()) System.out.println("TNC - DocTrack  - extractQRfromPDF - QRs arralist: " + r.getText());
+                    	QRs.add(r.getText()); //= new ArrayList<String>(set);
+                    
                     }
                     
                     
