@@ -119,11 +119,9 @@ NodeServicePolicies.OnDeleteNodePolicy {
      * @param nodeRef           the node reference
      * @param aspectTypeQName   the qname of the aspect being applied
      */
-	public String QRs[] = new String[]{};
+	public ArrayList<String> QRs = new ArrayList<String>();
 	
     public void onAddAspect(NodeRef nodeRef, QName aspectTypeQName){
-    	QRs = new String[0];
-    	Arrays.fill(QRs, null);
     	System.out.println("TNC - DocTrack - OnAddAspectPolicy Fired  -  " + " NodeRef: "+ nodeRef.getId() +"  -  Aspect: "+ aspectTypeQName.getLocalName());
     	ContentReader reader=null;
     	InputStream is=null;
@@ -143,12 +141,12 @@ NodeServicePolicies.OnDeleteNodePolicy {
  			System.out.println("TNC - DocTrack - Extract image from file content for QR searching");
 			qr = extractQRfromPDF(is);
 			if (QRs != null) {
- 				if (QRs.length>0){
+ 				if (QRs.size()>0){
  					System.out.println("TNC - DocTrack - find QR codes : '"+StringUtils.join(QRs,";")+"' Try to put content in referred node properties.");
  					//Set QRInfoString to QR code value.	
- 					ArrayList<Serializable> qrList = new ArrayList<Serializable>(Arrays.asList(QRs));
+ 					//ArrayList<Serializable> qrList = new ArrayList<Serializable>(Arrays.asList(QRs));
  				
- 					docTrackBehaviours.nodeService.setProperty(nodeRef, PROP_QRS,qrList);
+ 					docTrackBehaviours.nodeService.setProperty(nodeRef, PROP_QRS,QRs);
  				}	
  			}
 		} catch (Exception e) {
@@ -272,9 +270,11 @@ NodeServicePolicies.OnDeleteNodePolicy {
                     results=QRCode.readQRCode(image.getRGBImage());
                     for (Result r : results ){
                     	System.out.println("TNC - DocTrack  - extractQRfromPDF - code discovered: " + r.getText());
-                    	QRs=(String[]) ArrayUtils.add(QRs, r.getText());
+                    	QRs.add(r.getText());
+                    	if (logger.isDebugEnabled()) System.out.println("TNC - DocTrack  - extractQRfromPDF - QRs arralist: " + r.getText());;
+                    	
                     }
-                    if (QRs.length>=2){break;};
+                    
                     
                 }
                 // maybe there are more images embedded in a form object
