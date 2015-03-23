@@ -146,9 +146,11 @@ NodeServicePolicies.OnDeleteNodePolicy {
  				if (QRs.size()>0){
  					System.out.println("TNC - DocTrack - find QR codes : '"+StringUtils.join(QRs,";")+"' Try to put content in referred node properties.");
  					//Set QRInfoString to QR code value.	
- 					//ArrayList<Serializable> qrList = new ArrayList<Serializable>(Arrays.asList(QRs));
- 				
- 					docTrackBehaviours.nodeService.setProperty(nodeRef, PROP_QRS,QRs);
+ 					Map<QName, Serializable> map = new HashMap<QName, Serializable>();
+ 					map.put( PROP_QRS,QRs);
+ 					docTrackBehaviours.nodeService.addProperties(nodeRef, map);
+ 					
+ 					
  				}	
  			}
 		} catch (Exception e) {
